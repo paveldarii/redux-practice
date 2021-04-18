@@ -1,10 +1,12 @@
-import { createSlice } from '@reduxjs/toolkit';
-import moment from 'moment';
-import { createSelector } from 'reselect';
-import { apiCallBegan } from './api';
+//createSlice is a function that creates a entity that later will be combined with other entities
+import { createSlice } from "@reduxjs/toolkit";
+import moment from "moment";
+//for memoisation purposes we use reselect library
+import { createSelector } from "reselect";
+import { apiCallBegan } from "./api";
 
 const slice = createSlice({
-  name: 'bugs',
+  name: "bugs",
   initialState: {
     list: [],
     loading: false,
@@ -52,12 +54,12 @@ const {
 export default slice.reducer;
 
 // Action Creators
-const url = '/bugs';
+const url = "/bugs";
 
 export const loadBugs = () => (dispatch, getState) => {
   const { lastFetch } = getState().entities.bugs;
 
-  const diffInMinutes = moment().diff(moment(lastFetch), 'minutes');
+  const diffInMinutes = moment().diff(moment(lastFetch), "minutes");
   if (diffInMinutes < 10) return;
 
   dispatch(
@@ -73,7 +75,7 @@ export const loadBugs = () => (dispatch, getState) => {
 export const addBug = (bug) =>
   apiCallBegan({
     url,
-    method: 'post',
+    method: "post",
     data: bug,
     onSuccess: bugAdded.type,
   });
@@ -81,7 +83,7 @@ export const addBug = (bug) =>
 export const resolveBug = (id) =>
   apiCallBegan({
     url: `${url}/${id}`,
-    method: 'patch',
+    method: "patch",
     data: { resolved: true },
     onSuccess: bugResolved.type,
   });
@@ -89,12 +91,13 @@ export const resolveBug = (id) =>
 export const assignBugToUser = (bugId, userId) =>
   apiCallBegan({
     url: `${url}/${bugId}`,
-    method: 'patch',
+    method: "patch",
     data: { userId },
     onSuccess: bugAssignedToUser.type,
   });
 
-// Selector
+// Selector Memoisation
+// output is get passed to the result function which is the second one
 export const getUnresolvedBugs = createSelector(
   (state) => state.entities.bugs.list,
   (list) => list.filter((bug) => !bug.resolved)
